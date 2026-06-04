@@ -1,0 +1,1863 @@
+<!DOCTYPE html>
+<html lang="zh-TW" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>供應商進貨品質評估系統 | Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root[data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-color: #334155;
+            --accent-primary: #6366f1;
+            --accent-secondary: #8b5cf6;
+            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            --card-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            
+            --grade-a: #10b981;
+            --grade-b: #0ea5e9;
+            --grade-c: #f59e0b;
+            --grade-d: #f43f5e;
+        }
+
+        :root[data-theme="light"] {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --accent-primary: #4f46e5;
+            --accent-secondary: #7c3aed;
+            --accent-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(0, 0, 0, 0.05);
+            
+            --grade-a: #059669;
+            --grade-b: #0284c7;
+            --grade-c: #d97706;
+            --grade-d: #e11d48;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body {
+            font-family: 'Outfit', 'Inter', 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 24px;
+            overflow-x: hidden;
+        }
+
+        /* Container & Layout */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .header-title-container h1 {
+            font-size: 24px;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+        }
+
+        .header-title-container p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--accent-gradient);
+            color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .btn-icon {
+            padding: 10px;
+            border-radius: 10px;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-icon:hover {
+            background: var(--border-color);
+        }
+
+        /* KPI Cards Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .kpi-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent-gradient);
+            opacity: 0.8;
+        }
+
+        .kpi-title {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .kpi-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Main Workspace Grid */
+        .workspace {
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        @media (max-width: 1024px) {
+            .workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Left Column: Supplier List Panel */
+        .sidebar {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-height: 800px;
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 40px;
+            border-radius: 10px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+            width: 16px;
+            height: 16px;
+        }
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .supplier-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .supplier-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .supplier-list::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        .supplier-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            border-radius: 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .supplier-item:hover {
+            transform: translateX(4px);
+            border-color: var(--accent-primary);
+            box-shadow: var(--card-shadow);
+        }
+
+        .supplier-item.active {
+            background: var(--accent-gradient);
+            border-color: transparent;
+            color: white !important;
+        }
+
+        .supplier-item.active * {
+            color: white !important;
+        }
+
+        .sup-rank-name {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sup-rank {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .supplier-item.active .sup-rank {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .sup-info-title {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .sup-info-sub {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .sup-score-grade {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+
+        .sup-score {
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .grade-badge {
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .badge-a { background-color: rgba(16, 185, 129, 0.15); color: var(--grade-a); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge-b { background-color: rgba(14, 165, 233, 0.15); color: var(--grade-b); border: 1px solid rgba(14, 165, 233, 0.3); }
+        .badge-c { background-color: rgba(245, 158, 11, 0.15); color: var(--grade-c); border: 1px solid rgba(245, 158, 11, 0.3); }
+        .badge-d { background-color: rgba(244, 63, 94, 0.15); color: var(--grade-d); border: 1px solid rgba(244, 63, 94, 0.3); }
+
+        .supplier-item.active .grade-badge {
+            background-color: rgba(255, 255, 255, 0.25);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Right Column: Detail Dashboard Panel */
+        .detail-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .panel-header-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .panel-title-container h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .panel-ingredients {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .ingredient-tag {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .panel-header-stats {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .stat-block {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .stat-val {
+            font-size: 20px;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .grade-large {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 800;
+            font-family: 'Outfit', sans-serif;
+            color: white;
+            box-shadow: var(--card-shadow);
+        }
+
+        .bg-grade-a { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .bg-grade-b { background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); }
+        .bg-grade-c { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .bg-grade-d { background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%); }
+
+        /* Chart & Indicators Grid */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1.8fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            margin: auto;
+            width: 100%;
+            height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Dimension Scores List */
+        .dimension-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            justify-content: center;
+        }
+
+        .dim-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .dim-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .dim-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .dim-score-val {
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .dim-progress-bg {
+            height: 8px;
+            border-radius: 4px;
+            background: var(--bg-tertiary);
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .dim-progress-bar {
+            height: 100%;
+            border-radius: 4px;
+            width: 0%;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Evaluation Section */
+        .evaluation-card {
+            background: linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box,
+                        var(--accent-gradient) border-box;
+            border: 2px solid transparent;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .evaluation-title {
+            font-size: 16px;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .eval-text {
+            line-height: 1.6;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .recommendation-box {
+            background: var(--bg-tertiary);
+            padding: 16px;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-primary);
+        }
+
+        .recommendation-box h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .recommendation-box p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .action-list {
+            margin-left: 18px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Anomaly Breakdown */
+        .anomaly-box {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+        }
+
+        .anomaly-stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 4px;
+        }
+
+        .anom-icon-wrapper {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .anom-lbl {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .anom-count {
+            font-size: 18px;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-primary);
+        }
+
+        /* Collapsible Log Section */
+        .collapsible-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+        }
+
+        .collapsible-header {
+            padding: 18px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            background: rgba(255, 255, 255, 0.02);
+            font-weight: 600;
+        }
+
+        .collapsible-header:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .collapsible-content.open {
+            max-height: 400px;
+            overflow-y: auto;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .log-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        .log-table th, .log-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .log-table th {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        .log-table tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+            color: var(--text-muted);
+            text-align: center;
+            gap: 16px;
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            stroke: var(--text-muted);
+        }
+
+        /* File Upload Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+
+        .modal.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            font-size: 24px;
+            color: var(--text-muted);
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .close-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .dropzone {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .dropzone:hover, .dropzone.dragover {
+            border-color: var(--accent-primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .dropzone svg {
+            width: 48px;
+            height: 48px;
+            stroke: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .dropzone:hover svg {
+            stroke: var(--accent-primary);
+            transform: translateY(-4px);
+        }
+
+        .dropzone p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* SVG icon style helper */
+        .icon {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            display: inline-block;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="header-title-container">
+                <h1>供應商進貨品質評估看板</h1>
+                <p id="data-source-indicator">當前數據來源：預載進貨品質報表 (ING-007.csv)</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-outline" id="upload-csv-btn">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    上傳進貨 CSV
+                </button>
+                <button class="btn-icon" id="theme-toggle-btn" title="切換深淺模式">
+                    <!-- Sun icon -->
+                    <svg class="icon theme-sun" viewBox="0 0 24 24" style="display:none;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <!-- Moon icon -->
+                    <svg class="icon theme-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- KPI Grid -->
+        <div class="kpi-grid">
+            <div class="kpi-card" id="kpi-total-suppliers">
+                <div>
+                    <div class="kpi-title">評估供應商總數</div>
+                    <div class="kpi-value" id="kpi-val-total">-</div>
+                </div>
+                <div class="kpi-desc">評估系統覆蓋之供應商總家數</div>
+            </div>
+            <div class="kpi-card" id="kpi-avg-pass-rate">
+                <div>
+                    <div class="kpi-title">全體平均合格率</div>
+                    <div class="kpi-value" id="kpi-val-avg">-</div>
+                </div>
+                <div class="kpi-desc">所有進貨的加權平均合格率</div>
+            </div>
+            <div class="kpi-card" id="kpi-top-supplier">
+                <div>
+                    <div class="kpi-title">本期最優供應商</div>
+                    <div class="kpi-value" id="kpi-val-top" style="font-size:22px; line-height:36px;">-</div>
+                </div>
+                <div class="kpi-desc">進貨合格率與品質表現最優者</div>
+            </div>
+            <div class="kpi-card" id="kpi-worst-supplier">
+                <div>
+                    <div class="kpi-title">需緊急整改供應商</div>
+                    <div class="kpi-value" id="kpi-val-worst" style="font-size:22px; line-height:36px;">-</div>
+                </div>
+                <div class="kpi-desc">品質合格得分最低者，列為重點輔導對象</div>
+            </div>
+        </div>
+
+        <!-- Main Workspace -->
+        <div class="workspace">
+            <!-- Left: List Panel -->
+            <div class="sidebar">
+                <div class="search-container">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" class="search-input" id="supplier-search" placeholder="搜尋供應商或食材（例如：白米）...">
+                </div>
+                <div class="list-header">
+                    <span>供應商排名清單</span>
+                    <span id="list-count-badge">共 0 家</span>
+                </div>
+                <div class="supplier-list" id="supplier-list-container">
+                    <!-- Dynamic List Items -->
+                </div>
+            </div>
+
+            <!-- Right: Detail Panel -->
+            <div class="detail-panel" id="detail-panel-container">
+                <!-- Select a Supplier Alert if none active -->
+                <div class="empty-state" id="empty-state-view">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    <h3>請選擇左側供應商</h3>
+                    <p>點擊供應商清單，即可檢視其雷達圖分析、多指標評分與品質評語報告。</p>
+                </div>
+
+                <div id="supplier-detail-view" style="display: none; flex-direction: column; gap: 24px;">
+                    <!-- Detail Header -->
+                    <div class="panel-header-card">
+                        <div class="panel-title-container">
+                            <h2 id="detail-supplier-name">供應商名稱</h2>
+                            <div class="panel-ingredients" id="detail-ingredients-container">
+                                <!-- Tags -->
+                            </div>
+                        </div>
+                        <div class="panel-header-stats">
+                            <div class="stat-block">
+                                <span class="stat-label">進貨 / 退貨</span>
+                                <span class="stat-val" id="detail-in-ret-count">0 / 0</span>
+                            </div>
+                            <div class="stat-block">
+                                <span class="stat-label">進貨合格率</span>
+                                <span class="stat-val" id="detail-pass-rate" style="color: var(--accent-primary);">0.00%</span>
+                            </div>
+                            <div class="grade-large" id="detail-grade-badge">A</div>
+                        </div>
+                    </div>
+
+                    <!-- Chart & Indicators Grid -->
+                    <div class="detail-grid">
+                        <!-- Chart -->
+                        <div class="card">
+                            <div class="card-title">
+                                <svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"></polygon><line x1="12" y1="22" x2="12" y2="12"></line><line x1="12" y1="12" x2="22" y2="8.5"></line><line x1="12" y1="12" x2="2" y2="8.5"></line></svg>
+                                6大維度雷達圖分析 (RDA)
+                            </div>
+                            <div class="chart-wrapper">
+                                <canvas id="radar-chart-canvas"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Progress indicators -->
+                        <div class="card">
+                            <div class="card-title">
+                                <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                                品質指標得分 breakdown
+                            </div>
+                            <div class="dimension-list" id="detail-dimension-scores">
+                                <!-- Progress Bars -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Anomaly statistics -->
+                    <div class="card">
+                        <div class="card-title">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                            退貨異常原因統計 (次數)
+                        </div>
+                        <div class="anomaly-box" id="detail-anomaly-stats">
+                            <!-- Anomaly statistics boxes -->
+                        </div>
+                    </div>
+
+                    <!-- Multi-Indicator Dynamic Comments -->
+                    <div class="evaluation-card">
+                        <div class="evaluation-title">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                            綜合品質評語與整改建議
+                        </div>
+                        <div class="eval-text" id="detail-eval-summary">
+                            <!-- Dynamic eval comment -->
+                        </div>
+                        <div class="recommendation-box">
+                            <h4>核定處理意見</h4>
+                            <p id="detail-eval-recommendation">根據評分核定採購管制建議...</p>
+                        </div>
+                        <div>
+                            <h4 style="font-size: 13px; font-weight:600; margin-bottom:10px;">建議具體執行行動 (Action Items)</h4>
+                            <ul class="action-list" id="detail-eval-actions">
+                                <!-- Action items list -->
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Raw Logs collapse -->
+                    <div class="collapsible-card">
+                        <div class="collapsible-header" id="logs-collapsible-trigger">
+                            <span>檢視進貨異常明細紀錄 (Raw Cleaned Logs)</span>
+                            <svg class="icon" id="logs-collapse-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="collapsible-content" id="logs-collapsible-content">
+                            <table class="log-table">
+                                <thead>
+                                    <tr>
+                                        <th>行號</th>
+                                        <th>品項</th>
+                                        <th>進貨數(C)</th>
+                                        <th>退貨數(C)</th>
+                                        <th>原始異常描述</th>
+                                        <th>分類歸屬</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="detail-logs-tbody">
+                                    <!-- Log rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload CSV Modal -->
+    <div class="modal" id="upload-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>上傳進貨品質 CSV 報表</h3>
+                <button class="close-btn" id="close-modal-btn">&times;</button>
+            </div>
+            <div class="dropzone" id="csv-dropzone">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+                <p>將品質報表 CSV 拖曳到此處，或<strong>點擊選擇檔案</strong></p>
+                <span style="font-size:11px; color:var(--text-muted);">欄位格式必須包含：供應商、食材、進貨次數、退貨次數、異常次數</span>
+                <input type="file" id="csv-file-input" style="display:none;" accept=".csv">
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button class="btn btn-outline" id="cancel-upload-btn">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let supplierData = [];
+        let activeSupplierId = null;
+        let radarChartInstance = null;
+
+        // Preloaded dataset injected by builder
+        const PRELOADED_DATA = [{"supplier": "大全農產", "total_in": 2986, "total_ret": 1126, "pass_rate": 62.29, "grade": "C", "dimension_scores": {"溫度管理": 95.71, "規格重量": 99.1, "包裝外觀": 83.09, "外觀色澤": 94.37, "衛生安全": 93.9, "標示標籤": 96.12}, "anomaly_breakdown": {"標示標籤": 116, "包裝外觀": 505, "規格重量": 27, "溫度管理": 128, "衛生安全": 182, "外觀色澤": 168}, "ingredients": ["奶油", "白米", "雞胸肉", "起司", "醬油", "蝦仁", "牛奶"], "records_count": 11, "records": [{"row_index": 3, "ingredient": "白米", "raw_deliveries": "235", "raw_returns": "116", "cleaned_deliveries": 235, "cleaned_returns": 116, "raw_anomaly": "標示NG", "anomaly_category": "標示標籤"}, {"row_index": 5, "ingredient": "雞胸肉", "raw_deliveries": "335", "raw_returns": "60", "cleaned_deliveries": 335, "cleaned_returns": 60, "raw_anomaly": "封口不良", "anomaly_category": "包裝外觀"}, {"row_index": 14, "ingredient": "醬油", "raw_deliveries": "132", "raw_returns": "195", "cleaned_deliveries": 195, "cleaned_returns": 132, "raw_anomaly": "封口不良", "anomaly_category": "包裝外觀"}, {"row_index": 42, "ingredient": "奶油", "raw_deliveries": "178", "raw_returns": "27", "cleaned_deliveries": 178, "cleaned_returns": 27, "raw_anomaly": "重量不足", "anomaly_category": "規格重量"}, {"row_index": 46, "ingredient": "奶油", "raw_deliveries": "128", "raw_returns": "443", "cleaned_deliveries": 443, "cleaned_returns": 128, "raw_anomaly": "溫度偏高", "anomaly_category": "溫度管理"}, {"row_index": 58, "ingredient": "牛奶", "raw_deliveries": "249", "raw_returns": "182", "cleaned_deliveries": 249, "cleaned_returns": 182, "raw_anomaly": "異物", "anomaly_category": "衛生安全"}, {"row_index": 74, "ingredient": "醬油", "raw_deliveries": "206", "raw_returns": "350", "cleaned_deliveries": 350, "cleaned_returns": 206, "raw_anomaly": "封口不良", "anomaly_category": "包裝外觀"}, {"row_index": 88, "ingredient": "起司", "raw_deliveries": "421", "raw_returns": "101", "cleaned_deliveries": 421, "cleaned_returns": 101, "raw_anomaly": "封口不良", "anomaly_category": "包裝外觀"}, {"row_index": 89, "ingredient": "牛奶", "raw_deliveries": "184", "raw_returns": "152", "cleaned_deliveries": 184, "cleaned_returns": 152, "raw_anomaly": "顏色異常", "anomaly_category": "外觀色澤"}, {"row_index": 97, "ingredient": "蝦仁", "raw_deliveries": "6", "raw_returns": "349", "cleaned_deliveries": 349, "cleaned_returns": 6, "raw_anomaly": "破裂", "anomaly_category": "包裝外觀"}, {"row_index": 98, "ingredient": "醬油", "raw_deliveries": "16", "raw_returns": "47", "cleaned_deliveries": 47, "cleaned_returns": 16, "raw_anomaly": "顏色異常", "anomaly_category": "外觀色澤"}], "rank": 1}, {"supplier": "鮮供應", "total_in": 3518, "total_ret": 1727, "pass_rate": 50.91, "grade": "D", "dimension_scores": {"溫度管理": 97.9, "規格重量": 91.53, "包裝外觀": 92.24, "外觀色澤": 100.0, "衛生安全": 71.12, "標示標籤": 98.12}, "anomaly_breakdown": {"標示標籤": 66, "規格重量": 298, "衛生安全": 1016, "包裝外觀": 273, "溫度管理": 74, "外觀色澤": 0}, "ingredients": ["高麗菜", "鮭魚", "奶油", "番茄", "菇類", "雞胸肉", "蝦仁", "洋蔥", "未註明"], "records_count": 12, "records": [{"row_index": 17, "ingredient": "鮭魚", "raw_deliveries": "66", "raw_returns": "216", "cleaned_deliveries": 216, "cleaned_returns": 66, "raw_anomaly": "標示NG", "anomaly_category": "標示標籤"}, {"row_index": 28, "ingredient": "雞胸肉", "raw_deliveries": "415", "raw_returns": "298", "cleaned_deliveries": 415, "cleaned_returns": 298, "raw_anomaly": "重量不足", "anomaly_category": "規格重量"}, {"row_index": 33, "ingredient": "未註明", "raw_deliveries": "440", "raw_returns": "397", "cleaned_deliveries": 440, "cleaned_returns": 397, "raw_anomaly": "異物", "anomaly_category": "衛生安全"}, {"row_index": 36, "ingredient": "番茄", "raw_deliveries": "94", "raw_returns": "126", "cleaned_deliveries": 126, "cleaned_returns": 94, "raw_anomaly": "異物混入", "anomaly_category": "衛生安全"}, {"row_index": 41, "ingredient": "菇類", "raw_deliveries": "245", "raw_returns": "474", "cleaned_deliveries": 474, "cleaned_returns": 245, "raw_anomaly": "異物", "anomaly_category": "衛生安全"}, {"row_index": 48, "ingredient": "高麗菜", "raw_deliveries": "4", "raw_returns": "311", "cleaned_deliveries": 311, "cleaned_returns": 4, "raw_anomaly": "封口不良", "anomaly_category": "包裝外觀"}, {"row_index": 53, "ingredient": "洋蔥", "raw_deliveries": "221", "raw_returns": "375", "cleaned_deliveries": 375, "cleaned_returns": 221, "raw_anomaly": "異物", "anomaly_category": "衛生安全"}, {"row_index": 81, "ingredient": "蝦仁", "raw_deliveries": "59", "raw_returns": "259", "cleaned_deliveries": 259, "cleaned_returns": 59, "raw_anomaly": "異物", "anomaly_category": "衛生安全"}, {"row_index": 87, "ingredient": "洋蔥", "raw_deliveries": "21", "raw_returns": "12", "cleaned_deliveries": 21, "cleaned_returns": 12, "raw_anomaly": "溫度偏高", "anomaly_category": "溫度管理"}, {"row_index": 90, "ingredient": "奶油", "raw_deliveries": "115", "raw_returns": "84", "cleaned_deliveries": 115, "cleaned_returns": 84, "raw_anomaly": "封口不良", "anomaly_category": "包裝外觀"}, {"row_index": 94, "ingredient": "奶油", "raw_deliveries": "185", "raw_returns": "490", "cleaned_deliveries": 490, "cleaned_returns": 185, "raw_anomaly": "封口不良", "anomaly_category": "包裝外觀"}, {"row_index": 99, "ingredient": "高麗菜", "raw_deliveries": "62", "raw_returns": "276", "cleaned_deliveries": 276, "cleaned_returns": 62, "raw_anomaly": "溫度偏高", "anomaly_category": "溫度管理"}], "rank": 2}, {"supplier": "長榮食材", "total_in": 3660, "total_ret": 1810, "pass_rate": 50.55, "grade": "D", "dimension_scores": {"溫度管理": 90.38, "規格重量": 87.35, "包裝外觀": 85.19, "外觀色澤": 100.0, "衛生安全": 88.33, "標示標籤": 99.29}, "anomaly_breakdown": {"衛生安全": 427, "包裝外觀": 542, "規格重量": 463, "溫度管理": 352, "標示標籤": 26, "外觀色澤": 0}, "ingredients": ["豬絞肉", "砂糖", "馬鈴薯", "奶油", "番茄", "雞蛋", "雞胸肉", "醬油", "蝦仁"], "records_count": 13, "records": [{"row_index": 2, "ingredient": "醬油", "raw_deliveries": "492", "raw_returns": "138", "cleaned_deliveries": 492, "cleaned_returns": 138, "raw_anomaly": "有異物", "anomaly_category": "衛生安全"}, {"row_index": 4, "ingredient": "雞蛋", "raw_deliveries": "71", "raw_returns": "42", "cleaned_deliveries": 71, "cleaned_returns": 42, "raw_anomaly": "封口不良", "anomaly_category": "包裝外觀"}, {"row_index": 6, "ingredient": "奶油", "raw_deliveries": "191", "raw_returns": "106", "cleaned_deliveries": 191, "cleaned_returns": 106, "raw_anomaly": "重量不足", "anomaly_category": "規格重量"}, {"row_index": 12, "ingredient": "蝦仁", "raw_deliveries": "207", "raw_returns": "326", "cleaned_deliveries": 326, "cleaned_returns": 207, "raw_anomaly": "溫度偏高", "anomaly_category": "溫度管理"}, {"row_index": 15, "ingredient": "雞胸肉", "raw_deliveries": "112", "raw_returns": "58", "cleaned_deliveries": 112, "cleaned_returns": 58, "raw_anomaly": "破損", "anomaly_category": "包裝外觀"}, {"row_index": 21, "ingredient": "奶油", "raw_deliveries": "329", "raw_returns": "51", "cleaned_deliveries": 329, "cleaned_returns": 51, "raw_anomaly": "損壞", "anomaly_category": "包裝外觀"}, {"row_index": 22, "ingredient": "番茄", "raw_deliveries": "378", "raw_returns": "289", "cleaned_deliveries": 378, "cleaned_returns": 289, "raw_anomaly": "有異物", "anomaly_category": "衛生安全"}, {"row_index": 37, "ingredient": "馬鈴薯", "raw_deliveries": "106", "raw_returns": "60", "cleaned_deliveries": 106, "cleaned_returns": 60, "raw_anomaly": "封口不良", "anomaly_category": "包裝外觀"}, {"row_index": 47, "ingredient": "砂糖", "raw_deliveries": "88", "raw_returns": "372", "cleaned_deliveries": 372, "cleaned_returns": 88, "raw_anomaly": "溫度偏高", "anomaly_category": "溫度管理"}, {"row_index": 51, "ingredient": "番茄", "raw_deliveries": "241", "raw_returns": "57", "cleaned_deliveries": 241, "cleaned_returns": 57, "raw_anomaly": "溫度偏高", "anomaly_category": "溫度管理"}, {"row_index": 82, "ingredient": "醬油", "raw_deliveries": "211", "raw_returns": "26", "cleaned_deliveries": 211, "cleaned_returns": 26, "raw_anomaly": "標示錯誤", "anomaly_category": "標示標籤"}, {"row_index": 83, "ingredient": "豬絞肉", "raw_deliveries": "357", "raw_returns": "446", "cleaned_deliveries": 446, "cleaned_returns": 357, "raw_anomaly": "重量不足", "anomaly_category": "規格重量"}, {"row_index": 86, "ingredient": "雞胸肉", "raw_deliveries": "385", "raw_returns": "331", "cleaned_deliveries": 385, "cleaned_returns": 331, "raw_anomaly": "損壞", "anomaly_category": "包裝外觀"}], "rank": 3}, {"supplier": "海洋直送", "total_in": 4136, "total_ret": 2046, "pass_rate": 50.53, "grade": "D", "dimension_scores": {"溫度管理": 79.76, "規格重量": 100.0, "包裝外觀": 90.62, "外觀色澤": 90.91, "衛生安全": 95.82, "標示標籤": 100.0}, "anomaly_breakdown": {"外觀色澤": 376, "溫度管理": 837, "包裝外觀": 388, "衛生安全": 173, "其他": 272, "規格重量": 0, "標示標籤": 0}, "ingredients": ["高麗菜", "鮭魚", "紅蘿蔔", "奶油", "菇類", "雞蛋", "食用油", "醬油", "洋蔥"], "records_count": 11, "records": [{"row_index": 7, "ingredient": "奶油", "raw_deliveries": "43", "raw_returns": "158", "cleaned_deliveries": 158, "cleaned_returns": 43, "raw_anomaly": "變色", "anomaly_category": "外觀色澤"}, {"row_index": 8, "ingredient": "洋蔥", "raw_deliveries": "345", "raw_returns": "470", "cleaned_deliveries": 470, "cleaned_returns": 345, "raw_anomaly": "溫度偏高", "anomaly_category": "溫度管理"}, {"row_index": 10, "ingredient": "菇類", "raw_deliveries": "100", "raw_returns": "455", "cleaned_deliveries": 455, "cleaned_returns": 100, "raw_anomaly": "封口不良", "anomaly_category": "包裝外觀"}, {"row_index": 23, "ingredient": "雞蛋", "raw_deliveries": "333", "raw_returns": "430", "cleaned_deliveries": 430, "cleaned_returns": 333, "raw_anomaly": "變色", "anomaly_category": "外觀色澤"}, {"row_index": 25, "ingredient": "菇類", "raw_deliveries": "202", "raw_returns": "246", "cleaned_deliveries": 246, "cleaned_returns": 202, "raw_anomaly": "溫度偏高", "anomaly_category": "溫度管理"}, {"row_index": 31, "ingredient": "洋蔥", "raw_deliveries": "477", "raw_returns": "288", "cleaned_deliveries": 477, "cleaned_returns": 288, "raw_anomaly": "損壞", "anomaly_category": "包裝外觀"}, {"row_index": 40, "ingredient": "醬油", "raw_deliveries": "45", "raw_returns": "336", "cleaned_deliveries": 336, "cleaned_returns": 45, "raw_anomaly": "異物", "anomaly_category": "衛生安全"}, {"row_index": 50, "ingredient": "食用油", "raw_deliveries": "158", "raw_returns": "354", "cleaned_deliveries": 354, "cleaned_returns": 158, "raw_anomaly": "溫度偏高", "anomaly_category": "溫度管理"}, {"row_index": 56, "ingredient": "高麗菜", "raw_deliveries": "128", "raw_returns": "410", "cleaned_deliveries": 410, "cleaned_returns": 128, "raw_anomaly": "異物", "anomaly_category": "衛生安全"}, {"row_index": 72, "ingredient": "鮭魚", "raw_deliveries": "480", "raw_returns": "132", "cleaned_deliveries": 480, "cleaned_returns": 132, "raw_anomaly": "溫度偏高", "anomaly_category": "溫度管理"}, {"row_index": 75, "ingredient": "紅蘿蔔", "raw_deliveries": "320", "raw_returns": "272", "cleaned_deliveries": 320, "cleaned_returns": 272, "raw_anomaly": "", "anomaly_category": "其他"}], "rank": 4}, {"supplier": "豐收行", "total_in": 2975, "total_ret": 1476, "pass_rate": 50.39, "grade": "D", "dimension_scores": {"溫度管理": 98.29, "規格重量": 93.21, "包裝外觀": 95.06, "外觀色澤": 92.27, "衛生安全": 87.33, "標示標籤": 84.24}, "anomaly_breakdown": {"標示標籤": 469, "規格重量": 202, "外觀色澤": 230, "溫度管理": 51, "包裝外觀": 147, "衛生安全": 377}, "ingredients": ["高麗菜", "鮭魚", "白米", "起司", "雞胸肉", "食用油", "麵粉", "牛奶"], "records_count": 10, "records": [{"row_index": 11, "ingredient": "白米", "raw_deliveries": "345", "raw_returns": "368", "cleaned_deliveries": 368, "cleaned_returns": 345, "raw_anomaly": "標錯", "anomaly_category": "標示標籤"}, {"row_index": 16, "ingredient": "起司", "raw_deliveries": "202", "raw_returns": "288", "cleaned_deliveries": 288, "cleaned_returns": 202, "raw_anomaly": "重量不足", "anomaly_category": "規格重量"}, {"row_index": 24, "ingredient": "雞胸肉", "raw_deliveries": "239", "raw_returns": "124", "cleaned_deliveries": 239, "cleaned_returns": 124, "raw_anomaly": "變色", "anomaly_category": "外觀色澤"}, {"row_index": 35, "ingredient": "高麗菜", "raw_deliveries": "332", "raw_returns": "124", "cleaned_deliveries": 332, "cleaned_returns": 124, "raw_anomaly": "標示錯誤", "anomaly_category": "標示標籤"}, {"row_index": 45, "ingredient": "食用油", "raw_deliveries": "51", "raw_returns": "149", "cleaned_deliveries": 149, "cleaned_returns": 51, "raw_anomaly": "溫度偏高", "anomaly_category": "溫度管理"}, {"row_index": 59, "ingredient": "鮭魚", "raw_deliveries": "2", "raw_returns": "174", "cleaned_deliveries": 174, "cleaned_returns": 2, "raw_anomaly": "損壞", "anomaly_category": "包裝外觀"}, {"row_index": 63, "ingredient": "麵粉", "raw_deliveries": "138", "raw_returns": "438", "cleaned_deliveries": 438, "cleaned_returns": 138, "raw_anomaly": "異物混入", "anomaly_category": "衛生安全"}, {"row_index": 65, "ingredient": "鮭魚", "raw_deliveries": "239", "raw_returns": "292", "cleaned_deliveries": 292, "cleaned_returns": 239, "raw_anomaly": "有異物", "anomaly_category": "衛生安全"}, {"row_index": 91, "ingredient": "牛奶", "raw_deliveries": "468", "raw_returns": "145", "cleaned_deliveries": 468, "cleaned_returns": 145, "raw_anomaly": "損壞", "anomaly_category": "包裝外觀"}, {"row_index": 100, "ingredient": "雞胸肉", "raw_deliveries": "227", "raw_returns": "106", "cleaned_deliveries": 227, "cleaned_returns": 106, "raw_anomaly": "變色", "anomaly_category": "外觀色澤"}], "rank": 5}, {"supplier": "綠源", "total_in": 5569, "total_ret": 2863, "pass_rate": 48.59, "grade": "D", "dimension_scores": {"溫度管理": 93.14, "規格重量": 98.67, "包裝外觀": 87.18, "外觀色澤": 86.71, "衛生安全": 91.47, "標示標籤": 91.42}, "anomaly_breakdown": {"外觀色澤": 740, "標示標籤": 478, "溫度管理": 382, "衛生安全": 475, "規格重量": 74, "包裝外觀": 714}, "ingredients": ["砂糖", "馬鈴薯", "高麗菜", "奶油", "番茄", "豆腐", "菇類", "雞胸肉", "起司", "醬油", "洋蔥"], "records_count": 18, "records": [{"row_index": 9, "ingredient": "馬鈴薯", "raw_deliveries": "441", "raw_returns": "360", "cleaned_deliveries": 441, "cleaned_returns": 360, "raw_anomaly": "變色", "anomaly_category": "外觀色澤"}, {"row_index": 13, "ingredient": "奶油", "raw_deliveries": "468", "raw_returns": "380", "cleaned_deliveries": 468, "cleaned_returns": 380, "raw_anomaly": "變色", "anomaly_category": "外觀色澤"}, {"row_index": 20, "ingredient": "洋蔥", "raw_deliveries": "269", "raw_returns": "64", "cleaned_deliveries": 269, "cleaned_returns": 64, "raw_anomaly": "標示NG", "anomaly_category": "標示標籤"}, {"row_index": 30, "ingredient": "雞胸肉", "raw_deliveries": "204", "raw_returns": "207", "cleaned_deliveries": 207, "cleaned_returns": 204, "raw_anomaly": "溫度偏高", "anomaly_category": "溫度管理"}, {"row_index": 43, "ingredient": "馬鈴薯", "raw_deliveries": "", "raw_returns": "475", "cleaned_deliveries": 475, "cleaned_returns": 475, "raw_anomaly": "異物混入", "anomaly_category": "衛生安全"}, {"row_index": 44, "ingredient": "砂糖", "raw_deliveries": "74", "raw_returns": "111", "cleaned_deliveries": 111, "cleaned_returns": 74, "raw_anomaly": "重量不足", "anomaly_category": "規格重量"}, {"row_index": 49, "ingredient": "番茄", "raw_deliveries": "115", "raw_returns": "22", "cleaned_deliveries": 115, "cleaned_returns": 22, "raw_anomaly": "標示錯誤", "anomaly_category": "標示標籤"}, {"row_index": 55, "ingredient": "高麗菜", "raw_deliveries": "233", "raw_returns": "58", "cleaned_deliveries": 233, "cleaned_returns": 58, "raw_anomaly": "標示NG", "anomaly_category": "標示標籤"}, {"row_index": 69, "ingredient": "菇類", "raw_deliveries": "113", "raw_returns": "473", "cleaned_deliveries": 473, "cleaned_returns": 113, "raw_anomaly": "標錯", "anomaly_category": "標示標籤"}, {"row_index": 71, "ingredient": "豆腐", "raw_deliveries": "59", "raw_returns": "260", "cleaned_deliveries": 260, "cleaned_returns": 59, "raw_anomaly": "破損", "anomaly_category": "包裝外觀"}, {"row_index": 73, "ingredient": "菇類", "raw_deliveries": "83", "raw_returns": "466", "cleaned_deliveries": 466, "cleaned_returns": 83, "raw_anomaly": "破損", "anomaly_category": "包裝外觀"}, {"row_index": 77, "ingredient": "奶油", "raw_deliveries": "203", "raw_returns": "72", "cleaned_deliveries": 203, "cleaned_returns": 72, "raw_anomaly": "破損", "anomaly_category": "包裝外觀"}, {"row_index": 78, "ingredient": "起司", "raw_deliveries": "95", "raw_returns": "109", "cleaned_deliveries": 109, "cleaned_returns": 95, "raw_anomaly": "標示錯誤", "anomaly_category": "標示標籤"}, {"row_index": 79, "ingredient": "菇類", "raw_deliveries": "126", "raw_returns": "385", "cleaned_deliveries": 385, "cleaned_returns": 126, "raw_anomaly": "標示錯誤", "anomaly_category": "標示標籤"}, {"row_index": 84, "ingredient": "豆腐", "raw_deliveries": "465", "raw_returns": "243", "cleaned_deliveries": 465, "cleaned_returns": 243, "raw_anomaly": "破損", "anomaly_category": "包裝外觀"}, {"row_index": 85, "ingredient": "奶油", "raw_deliveries": "317", "raw_returns": "178", "cleaned_deliveries": 317, "cleaned_returns": 178, "raw_anomaly": "溫度偏高", "anomaly_category": "溫度管理"}, {"row_index": 92, "ingredient": "醬油", "raw_deliveries": "373", "raw_returns": "81", "cleaned_deliveries": 373, "cleaned_returns": 81, "raw_anomaly": "封口不良", "anomaly_category": "包裝外觀"}, {"row_index": 96, "ingredient": "豆腐", "raw_deliveries": "176", "raw_returns": "199", "cleaned_deliveries": 199, "cleaned_returns": 176, "raw_anomaly": "損壞", "anomaly_category": "包裝外觀"}], "rank": 6}, {"supplier": "益昌", "total_in": 3005, "total_ret": 1574, "pass_rate": 47.62, "grade": "D", "dimension_scores": {"溫度管理": 100.0, "規格重量": 79.33, "包裝外觀": 86.16, "外觀色澤": 84.66, "衛生安全": 98.6, "標示標籤": 100.0}, "anomaly_breakdown": {"外觀色澤": 461, "規格重量": 621, "包裝外觀": 416, "其他": 34, "衛生安全": 42, "溫度管理": 0, "標示標籤": 0}, "ingredients": ["馬鈴薯", "番茄", "雞蛋", "食用油", "麵粉", "起司", "菇類", "醬油", "牛奶"], "records_count": 10, "records": [{"row_index": 18, "ingredient": "醬油", "raw_deliveries": "432", "raw_returns": "316", "cleaned_deliveries": 432, "cleaned_returns": 316, "raw_anomaly": "變色", "anomaly_category": "外觀色澤"}, {"row_index": 19, "ingredient": "牛奶", "raw_deliveries": "57", "raw_returns": "27", "cleaned_deliveries": 57, "cleaned_returns": 27, "raw_anomaly": "變色", "anomaly_category": "外觀色澤"}, {"row_index": 39, "ingredient": "牛奶", "raw_deliveries": "118", "raw_returns": "187", "cleaned_deliveries": 187, "cleaned_returns": 118, "raw_anomaly": "顏色異常", "anomaly_category": "外觀色澤"}, {"row_index": 60, "ingredient": "番茄", "raw_deliveries": "192", "raw_returns": "282", "cleaned_deliveries": 282, "cleaned_returns": 192, "raw_anomaly": "重量不足", "anomaly_category": "規格重量"}, {"row_index": 61, "ingredient": "馬鈴薯", "raw_deliveries": "277", "raw_returns": "277", "cleaned_deliveries": 277, "cleaned_returns": 277, "raw_anomaly": "破裂", "anomaly_category": "包裝外觀"}, {"row_index": 66, "ingredient": "麵粉", "raw_deliveries": "491", "raw_returns": "237", "cleaned_deliveries": 491, "cleaned_returns": 237, "raw_anomaly": "重量不足", "anomaly_category": "規格重量"}, {"row_index": 68, "ingredient": "起司", "raw_deliveries": "192", "raw_returns": "455", "cleaned_deliveries": 455, "cleaned_returns": 192, "raw_anomaly": "重量不足", "anomaly_category": "規格重量"}, {"row_index": 70, "ingredient": "食用油", "raw_deliveries": "451", "raw_returns": "139", "cleaned_deliveries": 451, "cleaned_returns": 139, "raw_anomaly": "破損", "anomaly_category": "包裝外觀"}, {"row_index": 93, "ingredient": "雞蛋", "raw_deliveries": "34", "raw_returns": "67", "cleaned_deliveries": 67, "cleaned_returns": 34, "raw_anomaly": "", "anomaly_category": "其他"}, {"row_index": 95, "ingredient": "菇類", "raw_deliveries": "306", "raw_returns": "42", "cleaned_deliveries": 306, "cleaned_returns": 42, "raw_anomaly": "異物", "anomaly_category": "衛生安全"}], "rank": 7}, {"supplier": "台農", "total_in": 5592, "total_ret": 3958, "pass_rate": 29.22, "grade": "D", "dimension_scores": {"溫度管理": 81.42, "規格重量": 77.7, "包裝外觀": 93.92, "外觀色澤": 81.17, "衛生安全": 100.0, "標示標籤": 95.01}, "anomaly_breakdown": {"外觀色澤": 1053, "溫度管理": 1039, "規格重量": 1247, "包裝外觀": 340, "標示標籤": 279, "衛生安全": 0}, "ingredients": ["豬絞肉", "高麗菜", "馬鈴薯", "紅蘿蔔", "奶油", "雞蛋", "白米", "麵粉", "蝦仁", "洋蔥", "未註明"], "records_count": 16, "records": [{"row_index": 26, "ingredient": "白米", "raw_deliveries": "273", "raw_returns": "461", "cleaned_deliveries": 461, "cleaned_returns": 273, "raw_anomaly": "顏色異常", "anomaly_category": "外觀色澤"}, {"row_index": 27, "ingredient": "紅蘿蔔", "raw_deliveries": "460", "raw_returns": "432", "cleaned_deliveries": 460, "cleaned_returns": 432, "raw_anomaly": "溫度偏高", "anomaly_category": "溫度管理"}, {"row_index": 29, "ingredient": "紅蘿蔔", "raw_deliveries": "216", "raw_returns": "130", "cleaned_deliveries": 216, "cleaned_returns": 130, "raw_anomaly": "變色", "anomaly_category": "外觀色澤"}, {"row_index": 32, "ingredient": "馬鈴薯", "raw_deliveries": "", "raw_returns": "493", "cleaned_deliveries": 493, "cleaned_returns": 493, "raw_anomaly": "重量不足", "anomaly_category": "規格重量"}, {"row_index": 34, "ingredient": "豬絞肉", "raw_deliveries": "459", "raw_returns": "368", "cleaned_deliveries": 459, "cleaned_returns": 368, "raw_anomaly": "重量不足", "anomaly_category": "規格重量"}, {"row_index": 38, "ingredient": "雞蛋", "raw_deliveries": "316", "raw_returns": "248", "cleaned_deliveries": 316, "cleaned_returns": 248, "raw_anomaly": "顏色異常", "anomaly_category": "外觀色澤"}, {"row_index": 52, "ingredient": "洋蔥", "raw_deliveries": "308", "raw_returns": "295", "cleaned_deliveries": 308, "cleaned_returns": 295, "raw_anomaly": "重量不足", "anomaly_category": "規格重量"}, {"row_index": 54, "ingredient": "麵粉", "raw_deliveries": "340", "raw_returns": "453", "cleaned_deliveries": 453, "cleaned_returns": 340, "raw_anomaly": "破裂", "anomaly_category": "包裝外觀"}, {"row_index": 57, "ingredient": "白米", "raw_deliveries": "499", "raw_returns": "145", "cleaned_deliveries": 499, "cleaned_returns": 145, "raw_anomaly": "溫度偏高", "anomaly_category": "溫度管理"}, {"row_index": 62, "ingredient": "奶油", "raw_deliveries": "172", "raw_returns": "83", "cleaned_deliveries": 172, "cleaned_returns": 83, "raw_anomaly": "顏色異常", "anomaly_category": "外觀色澤"}, {"row_index": 64, "ingredient": "雞蛋", "raw_deliveries": "488", "raw_returns": "91", "cleaned_deliveries": 488, "cleaned_returns": 91, "raw_anomaly": "重量不足", "anomaly_category": "規格重量"}, {"row_index": 67, "ingredient": "紅蘿蔔", "raw_deliveries": "268", "raw_returns": "314", "cleaned_deliveries": 314, "cleaned_returns": 268, "raw_anomaly": "溫度偏高", "anomaly_category": "溫度管理"}, {"row_index": 76, "ingredient": "未註明", "raw_deliveries": "194", "raw_returns": "253", "cleaned_deliveries": 253, "cleaned_returns": 194, "raw_anomaly": "溫度偏高", "anomaly_category": "溫度管理"}, {"row_index": 80, "ingredient": "蝦仁", "raw_deliveries": "313", "raw_returns": "279", "cleaned_deliveries": 313, "cleaned_returns": 279, "raw_anomaly": "標錯", "anomaly_category": "標示標籤"}, {"row_index": 101, "ingredient": "高麗菜", "raw_deliveries": "71", "raw_returns": "71", "cleaned_deliveries": 71, "cleaned_returns": 71, "raw_anomaly": "顏色異常", "anomaly_category": "外觀色澤"}, {"row_index": 102, "ingredient": "雞蛋", "raw_deliveries": "316", "raw_returns": "248", "cleaned_deliveries": 316, "cleaned_returns": 248, "raw_anomaly": "顏色異常", "anomaly_category": "外觀色澤"}], "rank": 8}];
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load preloaded data
+            loadDataset(PRELOADED_DATA, "預載進貨品質報表 (ING-007.csv)");
+            
+            // Setup DOM event listeners
+            initTheme();
+            setupEventListeners();
+        });
+
+        // Load dataset and refresh UI
+        function loadDataset(data, sourceName) {
+            supplierData = data;
+            document.getElementById('data-source-indicator').textContent = `當前數據來源：${sourceName}`;
+            
+            // Update Dashboard Overview (KPIs)
+            updateKPIs();
+            
+            // Render Supplier List
+            renderSupplierList();
+            
+            // Show empty state, clear detail panel
+            document.getElementById('empty-state-view').style.display = 'flex';
+            document.getElementById('supplier-detail-view').style.display = 'none';
+            activeSupplierId = null;
+            if (radarChartInstance) {
+                radarChartInstance.destroy();
+                radarChartInstance = null;
+            }
+        }
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Theme toggle
+            document.getElementById('theme-toggle-btn').addEventListener('click', toggleTheme);
+
+            // Search input
+            document.getElementById('supplier-search').addEventListener('input', filterSuppliers);
+
+            // Modal controls
+            const uploadBtn = document.getElementById('upload-csv-btn');
+            const uploadModal = document.getElementById('upload-modal');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            const cancelBtn = document.getElementById('cancel-upload-btn');
+            const dropzone = document.getElementById('csv-dropzone');
+            const fileInput = document.getElementById('csv-file-input');
+
+            const openModal = () => uploadModal.classList.add('open');
+            const closeModal = () => uploadModal.classList.remove('open');
+
+            uploadBtn.addEventListener('click', openModal);
+            closeModalBtn.addEventListener('click', closeModal);
+            cancelBtn.addEventListener('click', closeModal);
+            
+            // Dropzone click
+            dropzone.addEventListener('click', () => fileInput.click());
+            
+            // Drag and drop events
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropzone.classList.add('dragover');
+            });
+
+            dropzone.addEventListener('dragleave', () => {
+                dropzone.classList.remove('dragover');
+            });
+
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('dragover');
+                if (e.dataTransfer.files.length > 0) {
+                    handleFile(e.dataTransfer.files[0]);
+                    closeModal();
+                }
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleFile(e.target.files[0]);
+                    closeModal();
+                }
+            });
+
+            // Logs Collapsible
+            const logsTrigger = document.getElementById('logs-collapsible-trigger');
+            const logsContent = document.getElementById('logs-collapsible-content');
+            const logsArrow = document.getElementById('logs-collapse-arrow');
+
+            logsTrigger.addEventListener('click', () => {
+                const isOpen = logsContent.classList.toggle('open');
+                if (isOpen) {
+                    logsContent.style.maxHeight = logsContent.scrollHeight + "px";
+                    logsArrow.style.transform = "rotate(180deg)";
+                } else {
+                    logsContent.style.maxHeight = "0";
+                    logsArrow.style.transform = "rotate(0deg)";
+                }
+            });
+        }
+
+        // Handle File Reading and Parsing
+        function handleFile(file) {
+            if (!file) return;
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const contents = e.target.result;
+                try {
+                    // Check if PapaParse is loaded
+                    if (typeof Papa !== 'undefined') {
+                        Papa.parse(contents, {
+                            header: false,
+                            skipEmptyLines: true,
+                            complete: function(results) {
+                                const parsedData = processCSVRows(results.data);
+                                loadDataset(parsedData, `自訂上傳：${file.name}`);
+                            },
+                            error: function(err) {
+                                alert(`解析 CSV 錯誤：${err.message}`);
+                            }
+                        });
+                    } else {
+                        // Manual CSV parser fallback
+                        const parsedData = manualParseCSV(contents);
+                        loadDataset(parsedData, `自訂上傳：${file.name} (無網絡引擎解析)`);
+                    }
+                } catch (error) {
+                    alert(`讀取/解析 CSV 失敗：${error.message}`);
+                }
+            };
+            
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        // Manual CSV Parser Fallback (No Internet)
+        function manualParseCSV(text) {
+            // Splitting by lines
+            const lines = text.split(/\r?\n/);
+            const rows = lines.map(line => {
+                // Simple regex for CSV parsing (handles quotes basic-ly)
+                let row = [];
+                let insideQuote = false;
+                let entry = "";
+                for (let i = 0; i < line.length; i++) {
+                    let char = line[i];
+                    if (char === '"') {
+                        insideQuote = !insideQuote;
+                    } else if (char === ',' && !insideQuote) {
+                        row.push(entry.replace(/^"|"$/g, ''));
+                        entry = "";
+                    } else {
+                        entry += char;
+                    }
+                }
+                row.push(entry.replace(/^"|"$/g, ''));
+                return row;
+            }).filter(r => r.length > 0);
+            
+            return processCSVRows(rows);
+        }
+
+        // Process CSV Rows using same rules as python analyze.py
+        function processCSVRows(rawRows) {
+            if (rawRows.length < 2) return [];
+            
+            // Header parsing
+            // Check BOM
+            let firstCell = rawRows[0][0] || '';
+            if (firstCell.startsWith('\ufeff')) {
+                rawRows[0][0] = firstCell.substring(1);
+            }
+            
+            const categoryMap = {
+                '溫度偏高': '溫度管理',
+                '重量不足': '規格重量',
+                '封口不良': '包裝外觀',
+                '破損': '包裝外觀',
+                '損壞': '包裝外觀',
+                '破裂': '包裝外觀',
+                '變色': '外觀色澤',
+                '顏色異常': '外觀色澤',
+                '異物': '衛生安全',
+                '有異物': '衛生安全',
+                '異物混入': '衛生安全',
+                '標示錯誤': '標示標籤',
+                '標示NG': '標示標籤',
+                '標錯': '標示標籤',
+                '': '其他'
+            };
+
+            const suppliers = {};
+
+            for (let i = 1; i < rawRows.length; i++) {
+                const row = rawRows[i];
+                if (!row || row.length === 0 || row.every(cell => !cell.trim())) continue;
+                
+                // Pad row
+                let padded = [...row];
+                while(padded.length < 5) padded.push('');
+                
+                let sup = padded[0].trim();
+                let ing = padded[1].trim();
+                let val_in = padded[2].trim();
+                let val_ret = padded[3].trim();
+                let anom = padded[4].trim();
+
+                sup = sup ? sup : '未知供應商';
+                ing = ing ? ing : '未註明';
+
+                let total_in = 0;
+                let total_ret = 0;
+
+                if (!val_in && val_ret) {
+                    total_in = parseInt(val_ret, 10) || 0;
+                    total_ret = total_in;
+                } else if (val_in && !val_ret) {
+                    total_in = parseInt(val_in, 10) || 0;
+                    total_ret = 0;
+                } else if (!val_in && !val_ret) {
+                    total_in = 0;
+                    total_ret = 0;
+                } else {
+                    total_in = parseInt(val_in, 10) || 0;
+                    total_ret = parseInt(val_ret, 10) || 0;
+                }
+
+                // Swap if deliveries < returns
+                if (total_in < total_ret) {
+                    let temp = total_in;
+                    total_in = total_ret;
+                    total_ret = temp;
+                }
+
+                const cat = categoryMap[anom] || '其他';
+
+                if (!suppliers[sup]) {
+                    suppliers[sup] = {
+                        supplier: sup,
+                        total_in: 0,
+                        total_ret: 0,
+                        by_category: {
+                            '溫度管理': 0, '規格重量': 0, '包裝外觀': 0, '外觀色澤': 0, '衛生安全': 0, '標示標籤': 0, '其他': 0
+                        },
+                        ingredients: new Set(),
+                        records: []
+                    };
+                }
+
+                suppliers[sup].total_in += total_in;
+                suppliers[sup].total_ret += total_ret;
+                suppliers[sup].by_category[cat] = (suppliers[sup].by_category[cat] || 0) + total_ret;
+                suppliers[sup].ingredients.add(ing);
+                suppliers[sup].records.push({
+                    row_index: i + 1,
+                    ingredient: ing,
+                    raw_deliveries: padded[2],
+                    raw_returns: padded[3],
+                    cleaned_deliveries: total_in,
+                    cleaned_returns: total_ret,
+                    raw_anomaly: padded[4],
+                    anomaly_category: cat
+                });
+            }
+
+            const reportList = Object.values(suppliers).map(s => {
+                const tot_in = s.total_in;
+                const tot_ret = s.total_ret;
+                const pass_rate = tot_in > 0 ? parseFloat(((1 - tot_ret / tot_in) * 100).toFixed(2)) : 100.0;
+                
+                let grade = 'D';
+                if (pass_rate >= 90.0) grade = 'A';
+                else if (pass_rate >= 80.0) grade = 'B';
+                else if (pass_rate >= 60.0) grade = 'C';
+
+                const dimension_scores = {};
+                ['溫度管理', '規格重量', '包裝外觀', '外觀色澤', '衛生安全', '標示標籤'].forEach(cat => {
+                    const ret_in_cat = s.by_category[cat] || 0;
+                    const deduction = tot_in > 0 ? (ret_in_cat / tot_in) * 100 : 0;
+                    dimension_scores[cat] = parseFloat(Math.max(0.0, 100.0 - deduction).toFixed(2));
+                });
+
+                return {
+                    supplier: s.supplier,
+                    total_in: tot_in,
+                    total_ret: tot_ret,
+                    pass_rate: pass_rate,
+                    grade: grade,
+                    dimension_scores: dimension_scores,
+                    anomaly_breakdown: s.by_category,
+                    ingredients: Array.from(s.ingredients),
+                    records_count: s.records.length,
+                    records: s.records.sort((a,b) => a.row_index - b.row_index)
+                };
+            });
+
+            // Rank
+            reportList.sort((a, b) => {
+                if (b.pass_rate !== a.pass_rate) {
+                    return b.pass_rate - a.pass_rate;
+                }
+                return b.total_in - a.total_in;
+            });
+
+            reportList.forEach((item, idx) => {
+                item.rank = idx + 1;
+            });
+
+            return reportList;
+        }
+
+        // Update KPIs
+        function updateKPIs() {
+            if (supplierData.length === 0) {
+                document.getElementById('kpi-val-total').textContent = '-';
+                document.getElementById('kpi-val-avg').textContent = '-';
+                document.getElementById('kpi-val-top').textContent = '-';
+                document.getElementById('kpi-val-worst').textContent = '-';
+                return;
+            }
+
+            // Total suppliers
+            document.getElementById('kpi-val-total').textContent = supplierData.length;
+
+            // Average weighted pass rate
+            let totalIn = 0;
+            let totalRet = 0;
+            supplierData.forEach(s => {
+                totalIn += s.total_in;
+                totalRet += s.total_ret;
+            });
+            const avgRate = totalIn > 0 ? ((1 - totalRet / totalIn) * 100).toFixed(2) : 100.00;
+            document.getElementById('kpi-val-avg').textContent = `${avgRate}%`;
+
+            // Top Supplier
+            const topSup = supplierData[0];
+            document.getElementById('kpi-val-top').innerHTML = `${topSup.supplier} <span style="font-size: 14px; font-weight:500; opacity:0.8;">(${topSup.pass_rate}%)</span>`;
+
+            // Worst Supplier
+            const worstSup = supplierData[supplierData.length - 1];
+            document.getElementById('kpi-val-worst').innerHTML = `${worstSup.supplier} <span style="font-size: 14px; font-weight:500; opacity:0.8;">(${worstSup.pass_rate}%)</span>`;
+        }
+
+        // Render Supplier List
+        function renderSupplierList(filterText = '') {
+            const container = document.getElementById('supplier-list-container');
+            container.innerHTML = '';
+            
+            const filtered = supplierData.filter(s => {
+                const searchStr = filterText.toLowerCase();
+                const matchesName = s.supplier.toLowerCase().includes(searchStr);
+                const matchesIng = s.ingredients.some(i => i.toLowerCase().includes(searchStr));
+                return matchesName || matchesIng;
+            });
+
+            document.getElementById('list-count-badge').textContent = `共 ${filtered.length} 家`;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding: 40px 10px; color:var(--text-muted); font-size:13px;">未找到匹配的供應商</div>`;
+                return;
+            }
+
+            filtered.forEach(s => {
+                const activeClass = activeSupplierId === s.supplier ? 'active' : '';
+                const item = document.createElement('div');
+                item.className = `supplier-item ${activeClass}`;
+                item.setAttribute('id', `sup-item-${s.supplier.replace(/\s+/g, '-')}`);
+                
+                // Truncate ingredients string for preview
+                let ingPreview = s.ingredients.join(', ');
+                if (ingPreview.length > 20) ingPreview = ingPreview.substring(0, 18) + '...';
+
+                item.innerHTML = `
+                    <div class="sup-rank-name">
+                        <div class="sup-rank">${s.rank}</div>
+                        <div>
+                            <div class="sup-info-title">${s.supplier}</div>
+                            <div class="sup-info-sub">主營：${ingPreview}</div>
+                        </div>
+                    </div>
+                    <div class="sup-score-grade">
+                        <div class="sup-score">${s.pass_rate}%</div>
+                        <span class="grade-badge badge-${s.grade.toLowerCase()}">${s.grade} 等級</span>
+                    </div>
+                `;
+
+                item.addEventListener('click', () => {
+                    selectSupplier(s.supplier);
+                });
+
+                container.appendChild(item);
+            });
+        }
+
+        // Filter Suppliers
+        function filterSuppliers(e) {
+            renderSupplierList(e.target.value);
+        }
+
+        // Select and Display Supplier Details
+        function selectSupplier(supplierName) {
+            activeSupplierId = supplierName;
+            
+            // Toggle active classes in list
+            const items = document.querySelectorAll('.supplier-item');
+            items.forEach(item => {
+                item.classList.remove('active');
+            });
+            const activeItem = document.getElementById(`sup-item-${supplierName.replace(/\s+/g, '-')}`);
+            if (activeItem) {
+                activeItem.classList.add('active');
+            }
+
+            // Show Panel Details, hide empty state
+            document.getElementById('empty-state-view').style.display = 'none';
+            document.getElementById('supplier-detail-view').style.display = 'flex';
+
+            const supplier = supplierData.find(s => s.supplier === supplierName);
+            if (!supplier) return;
+
+            // Fill header info
+            document.getElementById('detail-supplier-name').textContent = supplier.supplier;
+            document.getElementById('detail-in-ret-count').textContent = `${supplier.total_in} / ${supplier.total_ret}`;
+            document.getElementById('detail-pass-rate').textContent = `${supplier.pass_rate}%`;
+            
+            const gradeBadge = document.getElementById('detail-grade-badge');
+            gradeBadge.textContent = supplier.grade;
+            gradeBadge.className = `grade-large bg-grade-${supplier.grade.toLowerCase()}`;
+
+            // Render Ingredients Tags
+            const tagsContainer = document.getElementById('detail-ingredients-container');
+            tagsContainer.innerHTML = '';
+            supplier.ingredients.forEach(ing => {
+                const tag = document.createElement('span');
+                tag.className = 'ingredient-tag';
+                tag.textContent = ing;
+                tagsContainer.appendChild(tag);
+            });
+
+            // Render dimension scores with progress bars
+            renderDimensionScores(supplier);
+
+            // Render anomaly stats cards
+            renderAnomalyStats(supplier);
+
+            // Render Dynamic AI Quality Evaluation Comments
+            renderEvaluationReport(supplier);
+
+            // Render logs list
+            renderRawLogs(supplier);
+
+            // Render Radar Chart
+            renderRadarChart(supplier);
+        }
+
+        // Render Dimension Scores
+        function renderDimensionScores(supplier) {
+            const container = document.getElementById('detail-dimension-scores');
+            container.innerHTML = '';
+
+            const dimColors = {
+                '溫度管理': 'var(--accent-primary)',
+                '規格重量': '#3b82f6',
+                '包裝外觀': '#10b981',
+                '外觀色澤': '#ec4899',
+                '衛生安全': '#ef4444',
+                '標示標籤': '#f59e0b'
+            };
+
+            Object.entries(supplier.dimension_scores).forEach(([cat, val]) => {
+                const barColor = dimColors[cat] || 'var(--text-muted)';
+                const item = document.createElement('div');
+                item.className = 'dim-item';
+                item.innerHTML = `
+                    <div class="dim-meta">
+                        <span class="dim-name">${cat}</span>
+                        <span class="dim-score-val" style="color: ${barColor};">${val} 分</span>
+                    </div>
+                    <div class="dim-progress-bg">
+                        <div class="dim-progress-bar" style="background-color: ${barColor}; width: 0%;"></div>
+                    </div>
+                `;
+                container.appendChild(item);
+                
+                // Trigger transition effect
+                setTimeout(() => {
+                    const progressBar = item.querySelector('.dim-progress-bar');
+                    if (progressBar) progressBar.style.width = `${val}%`;
+                }, 50);
+            });
+        }
+
+        // Render Anomaly Statistics
+        function renderAnomalyStats(supplier) {
+            const container = document.getElementById('detail-anomaly-stats');
+            container.innerHTML = '';
+
+            const anomalyIcons = {
+                '溫度管理': '🌡️',
+                '規格重量': '⚖️',
+                '包裝外觀': '📦',
+                '外觀色澤': '🎨',
+                '衛生安全': '🪰',
+                '標示標籤': '🏷️',
+                '其他': '❓'
+            };
+
+            const categories = ['溫度管理', '規格重量', '包裝外觀', '外觀色澤', '衛生安全', '標示標籤', '其他'];
+            categories.forEach(cat => {
+                const count = supplier.anomaly_breakdown[cat] || 0;
+                if (count > 0 || cat !== '其他') { // Always show primary categories, show 'other' only if count > 0
+                    const card = document.createElement('div');
+                    card.className = 'anomaly-stat-card';
+                    card.innerHTML = `
+                        <div class="anom-icon-wrapper">${anomalyIcons[cat] || '❓'}</div>
+                        <div class="anom-lbl">${cat}</div>
+                        <div class="anom-count">${count}</div>
+                    `;
+                    container.appendChild(card);
+                }
+            });
+        }
+
+        // Render dynamic comments
+        function renderEvaluationReport(supplier) {
+            const evalObj = generateSupplierComment(supplier);
+            
+            document.getElementById('detail-eval-summary').innerHTML = evalObj.summary;
+            document.getElementById('detail-eval-recommendation').textContent = evalObj.recommendation;
+            
+            const actionsContainer = document.getElementById('detail-eval-actions');
+            actionsContainer.innerHTML = '';
+            evalObj.actions.forEach(action => {
+                const li = document.createElement('li');
+                li.textContent = action;
+                actionsContainer.appendChild(li);
+            });
+        }
+
+        // Generate dynamic evaluation comment based on supplier stats
+        function generateSupplierComment(supplierData) {
+            const name = supplierData.supplier;
+            const score = supplierData.pass_rate;
+            const grade = supplierData.grade;
+            const scores = supplierData.dimension_scores;
+            
+            // Sort dimensions to find strengths and weaknesses
+            const dims = Object.entries(scores).map(([k, v]) => ({ name: k, score: v }));
+            dims.sort((a, b) => a.score - b.score);
+            
+            const lowest = dims[0]; // worst
+            const second_lowest = dims[1];
+            
+            const highest = dims[dims.length - 1]; // best
+            const second_highest = dims[dims.length - 2];
+            
+            let evaluation = "";
+            let actionItems = [];
+            
+            // 1. Overall assessment
+            if (grade === 'A') {
+                evaluation = `【${name}】本期進貨品質表現極為卓越，綜合得分高達 <strong>${score} 分</strong>。該供應商的進貨品質高度一致且優良，反映其廠內具備健全穩定的品質控制體系。`;
+            } else if (grade === 'B') {
+                evaluation = `【${name}】本期品質表現良好，綜合得分 <strong>${score} 分</strong>。絕大多數品項進貨檢驗皆能符合標準，具備穩定的供貨品質與可靠度。`;
+            } else if (grade === 'C') {
+                evaluation = `【${name}】本期進貨品質表現一般，綜合得分為 <strong>${score} 分</strong>（評定為 C 等級）。品質表現存在波動，部分指標出現退貨頻發的現象，需引起採購與品檢部門注意。`;
+            } else {
+                evaluation = `【${name}】本期品質表現不合格，綜合得分僅有 <strong>${score} 分</strong>（評定為 D 等級，不合格）。其退貨率偏高，存在嚴重的品質失控或衛生安全隱患，應列為重點管制廠商。`;
+            }
+            
+            // 2. Strengths and weaknesses details
+            let strengthsText = "";
+            if (highest.score >= 95.0) {
+                if (second_highest.score >= 90.0) {
+                    strengthsText = `優勢維度表現在 <strong>${highest.name}</strong>（${highest.score}分）與 <strong>${second_highest.name}</strong>（${second_highest.score}分），這兩個指標目前控制十分良好。`;
+                } else {
+                    strengthsText = `在各項品質指標中，以 <strong>${highest.name}</strong>（${highest.score}分）的管控表現最為理想。`;
+                }
+            } else {
+                strengthsText = `在現有條件下，品質維度中表現相對較好的是 <strong>${highest.name}</strong>（${highest.score}分），但仍具備改善與優化的空間。`;
+            }
+            
+            let weaknessesText = "";
+            if (lowest.score < 80.0) {
+                weaknessesText = `主要的品質短板顯著出現在 <strong>${lowest.name}</strong>（${lowest.score}分）`;
+                actionItems.push(`針對 <strong>${lowest.name}</strong> 問題，發出品質糾正與預防措施單 (CAPA)，要求供應商於一週內提交 8D 原因分析與糾正報告。`);
+                
+                if (second_lowest.score < 85.0) {
+                    weaknessesText += `以及 <strong>${second_lowest.name}</strong>（${second_lowest.score}分），這兩項異常頻繁發生是導致整體評分偏低的關鍵因素。`;
+                    actionItems.push(`加強對供應商 <strong>${second_lowest.name}</strong> 的現場收貨查驗力度，必要時採取雙倍抽樣計畫。`);
+                } else {
+                    weaknessesText += `，該項目的不良退貨率已嚴重偏離正常水準，必須啟動專案檢討。`;
+                }
+            } else if (lowest.score < 90.0) {
+                weaknessesText = `其品質結構相對平均，但建議針對表現較弱的 <strong>${lowest.name}</strong>（${lowest.score}分）進行優化。`;
+                actionItems.push(`通知供應商其 <strong>${lowest.name}</strong> 指標分數略低，要求其加強廠內相關製程之自主檢驗。`);
+            } else {
+                weaknessesText = `各維度控制均勻，均在 A 級優良標準以上。`;
+                actionItems.push(`維持目前良好的品質監督機制，與供應商保持資訊對接。`);
+            }
+            
+            // Overall recommendation based on Grade
+            let summaryRecommendation = "";
+            if (grade === 'A') {
+                summaryRecommendation = "建議維持正常合作，並優先列入「綠色通道」供應商，提供減少進廠抽驗頻率、優先配單等激勵政策。";
+                actionItems.unshift("納入優良供應商名錄，可享免檢或抽檢頻率減半獎勵。");
+            } else if (grade === 'B') {
+                summaryRecommendation = "建議正常供貨與結算。定期回饋考核評分，要求其針對弱項進行預防性製程調整。";
+                actionItems.unshift("向供應商發送本期考核評分，提醒其自主改進落後指標。");
+            } else if (grade === 'C') {
+                summaryRecommendation = "建議納入品質觀察名單，限期改善。需由品保部門發文告誡，並於下一次進貨時重點監控其弱項指標。";
+                actionItems.unshift("發布品質預警通知，約談其品質業務窗口，促使其進行自主稽核。");
+            } else {
+                summaryRecommendation = "列入【高風險整改名單】，限期一個月整改。整改期間限制採購比例、增加進貨檢驗覆蓋率（100%全檢或嚴格抽檢）。若限期未善意回應或改善，將啟動減量、凍結採購或啟動替代供應商流程。";
+                actionItems.unshift("召集跨部門（採購、品保、倉儲）召開供應商品質整改檢討會，進行嚴厲約談。");
+                actionItems.push("通知品保部門對該廠商隨後三批進貨執行「加嚴檢驗」或 100% 拆箱細檢。");
+            }
+            
+            return {
+                summary: `${evaluation} ${strengthsText} ${weaknessesText}`,
+                recommendation: summaryRecommendation,
+                actions: actionItems
+            };
+        }
+
+        // Render Raw Logs Collapsible Table
+        function renderRawLogs(supplier) {
+            const tbody = document.getElementById('detail-logs-tbody');
+            tbody.innerHTML = '';
+
+            const logs = supplier.records || [];
+            
+            if (logs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">無明細紀錄</td></tr>`;
+                return;
+            }
+
+            logs.forEach(log => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-family:'Outfit',sans-serif; color:var(--text-muted);">${log.row_index}</td>
+                    <td style="font-weight:500;">${log.ingredient}</td>
+                    <td style="font-family:'Outfit',sans-serif;">${log.cleaned_deliveries}</td>
+                    <td style="font-family:'Outfit',sans-serif; color:var(--grade-d); font-weight:600;">${log.cleaned_returns}</td>
+                    <td style="font-size:12px;">${log.raw_anomaly || '<span style="color:var(--text-muted);">無</span>'}</td>
+                    <td><span class="ingredient-tag" style="background-color:rgba(99,102,241,0.08); border-color:rgba(99,102,241,0.15);">${log.anomaly_category}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            // Adjust collapsible container max height if it is open
+            const logsContent = document.getElementById('logs-collapsible-content');
+            if (logsContent.classList.contains('open')) {
+                logsContent.style.maxHeight = logsContent.scrollHeight + "px";
+            }
+        }
+
+        // Render Radar Chart with Chart.js
+        function renderRadarChart(supplier) {
+            const ctx = document.getElementById('radar-chart-canvas').getContext('2d');
+            
+            if (radarChartInstance) {
+                radarChartInstance.destroy();
+            }
+
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            
+            const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)';
+            const angleLineColor = isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.1)';
+            const pointColor = isDark ? '#ffffff' : '#0f172a';
+            const labelColor = isDark ? '#94a3b8' : '#475569';
+
+            const labels = ['溫度管理', '規格重量', '包裝外觀', '外觀色澤', '衛生安全', '標示標籤'];
+            const dataValues = labels.map(lbl => supplier.dimension_scores[lbl] || 0);
+
+            radarChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '得分',
+                        data: dataValues,
+                        backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                        borderColor: 'rgba(99, 102, 241, 0.8)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(139, 92, 246, 1)',
+                        pointBorderColor: pointColor,
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: isDark ? '#1e293b' : '#ffffff',
+                            titleColor: isDark ? '#f8fafc' : '#0f172a',
+                            bodyColor: isDark ? '#94a3b8' : '#475569',
+                            borderColor: 'rgba(99, 102, 241, 0.3)',
+                            borderWidth: 1,
+                            padding: 10,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return `評分: ${context.formattedValue} 分`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: {
+                                color: angleLineColor
+                            },
+                            grid: {
+                                color: gridColor
+                            },
+                            pointLabels: {
+                                color: labelColor,
+                                font: {
+                                    family: "'Outfit', 'Noto Sans TC', sans-serif",
+                                    size: 11,
+                                    weight: '500'
+                                }
+                            },
+                            ticks: {
+                                color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
+                                backdropColor: 'transparent',
+                                font: {
+                                    size: 10,
+                                    family: "'Outfit', sans-serif"
+                                }
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        // Themes Toggle
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeToggleButton(savedTheme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeToggleButton(newTheme);
+            
+            // Re-render chart to update colors
+            if (activeSupplierId) {
+                const supplier = supplierData.find(s => s.supplier === activeSupplierId);
+                if (supplier) renderRadarChart(supplier);
+            }
+        }
+
+        function updateThemeToggleButton(theme) {
+            const sunIcon = document.querySelector('.theme-sun');
+            const moonIcon = document.querySelector('.theme-moon');
+            if (theme === 'dark') {
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+            } else {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
