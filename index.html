@@ -1007,7 +1007,7 @@
                     <div class="evaluation-card">
                         <div class="evaluation-title">
                             <svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                            綜合品質評語與整改建議
+                            AI綜合品質評語與整改建議
                         </div>
                         <div class="eval-text" id="detail-eval-summary">
                             <!-- Dynamic eval comment -->
@@ -1062,7 +1062,7 @@
             </div>
             <div class="dropzone" id="csv-dropzone">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
-                <p>將品質報表 CSV 拖曳到此處，或<strong>點擊選擇檔案</strong></p>
+                <p>將品質報表 CSV 拖曳到此處，或點擊選擇檔案</p>
                 <span style="font-size:11px; color:var(--text-muted);">欄位格式必須包含：供應商、食材、進貨次數、退貨次數、異常次數</span>
                 <input type="file" id="csv-file-input" style="display:none;" accept=".csv">
             </div>
@@ -1641,41 +1641,41 @@
             
             // 1. Overall assessment
             if (grade === 'A') {
-                evaluation = `【${name}】本期進貨品質表現極為卓越，綜合得分高達 <strong>${score} 分</strong>。該供應商的進貨品質高度一致且優良，反映其廠內具備健全穩定的品質控制體系。`;
+                evaluation = `【${name}】本期進貨品質表現極為卓越，綜合得分高達 ${score} 分。該供應商的進貨品質高度一致且優良，反映其廠內具備健全穩定的品質控制體系。`;
             } else if (grade === 'B') {
-                evaluation = `【${name}】本期品質表現良好，綜合得分 <strong>${score} 分</strong>。絕大多數品項進貨檢驗皆能符合標準，具備穩定的供貨品質與可靠度。`;
+                evaluation = `【${name}】本期品質表現良好，綜合得分 ${score} 分。絕大多數品項進貨檢驗皆能符合標準，具備穩定的供貨品質與可靠度。`;
             } else if (grade === 'C') {
-                evaluation = `【${name}】本期進貨品質表現一般，綜合得分為 <strong>${score} 分</strong>（評定為 C 等級）。品質表現存在波動，部分指標出現退貨頻發的現象，需引起採購與品檢部門注意。`;
+                evaluation = `【${name}】本期進貨品質表現一般，綜合得分為 ${score} 分（評定為 C 等級）。品質表現存在波動，部分指標出現退貨頻發的現象，需引起採購與品檢部門注意。`;
             } else {
-                evaluation = `【${name}】本期品質表現不合格，綜合得分僅有 <strong>${score} 分</strong>（評定為 D 等級，不合格）。其退貨率偏高，存在嚴重的品質失控或衛生安全隱患，應列為重點管制廠商。`;
+                evaluation = `【${name}】本期品質表現不合格，綜合得分僅有 ${score} 分（評定為 D 等級，不合格）。其退貨率偏高，存在嚴重的品質失控或衛生安全隱患，應列為重點管制廠商。`;
             }
             
             // 2. Strengths and weaknesses details
             let strengthsText = "";
             if (highest.score >= 95.0) {
                 if (second_highest.score >= 90.0) {
-                    strengthsText = `優勢維度表現在 <strong>${highest.name}</strong>（${highest.score}分）與 <strong>${second_highest.name}</strong>（${second_highest.score}分），這兩個指標目前控制十分良好。`;
+                    strengthsText = `優勢維度表現在 ${highest.name}（${highest.score}分）與 ${second_highest.name}（${second_highest.score}分），這兩個指標目前控制十分良好。`;
                 } else {
-                    strengthsText = `在各項品質指標中，以 <strong>${highest.name}</strong>（${highest.score}分）的管控表現最為理想。`;
+                    strengthsText = `在各項品質指標中，以 ${highest.name}（${highest.score}分）的管控表現最為理想。`;
                 }
             } else {
-                strengthsText = `在現有條件下，品質維度中表現相對較好的是 <strong>${highest.name}</strong>（${highest.score}分），但仍具備改善與優化的空間。`;
+                strengthsText = `在現有條件下，品質維度中表現相對較好的是 ${highest.name}（${highest.score}分），但仍具備改善與優化的空間。`;
             }
             
             let weaknessesText = "";
             if (lowest.score < 80.0) {
-                weaknessesText = `主要的品質短板顯著出現在 <strong>${lowest.name}</strong>（${lowest.score}分）`;
-                actionItems.push(`針對 <strong>${lowest.name}</strong> 問題，發出品質糾正與預防措施單 (CAPA)，要求供應商於一週內提交 8D 原因分析與糾正報告。`);
+                weaknessesText = `主要的品質短板顯著出現在 ${lowest.name}（${lowest.score}分）`;
+                actionItems.push(`針對 ${lowest.name} 問題，發出品質糾正與預防措施單 (CAPA)，要求供應商於一週內提交 8D 原因分析與糾正報告。`);
                 
                 if (second_lowest.score < 85.0) {
-                    weaknessesText += `以及 <strong>${second_lowest.name}</strong>（${second_lowest.score}分），這兩項異常頻繁發生是導致整體評分偏低的關鍵因素。`;
-                    actionItems.push(`加強對供應商 <strong>${second_lowest.name}</strong> 的現場收貨查驗力度，必要時採取雙倍抽樣計畫。`);
+                    weaknessesText += `以及 ${second_lowest.name}（${second_lowest.score}分），這兩項異常頻繁發生是導致整體評分偏低的關鍵因素。`;
+                    actionItems.push(`加強對供應商 ${second_lowest.name} 的現場收貨查驗力度，必要時採取雙倍抽樣計畫。`);
                 } else {
                     weaknessesText += `，該項目的不良退貨率已嚴重偏離正常水準，必須啟動專案檢討。`;
                 }
             } else if (lowest.score < 90.0) {
-                weaknessesText = `其品質結構相對平均，但建議針對表現較弱的 <strong>${lowest.name}</strong>（${lowest.score}分）進行優化。`;
-                actionItems.push(`通知供應商其 <strong>${lowest.name}</strong> 指標分數略低，要求其加強廠內相關製程之自主檢驗。`);
+                weaknessesText = `其品質結構相對平均，但建議針對表現較弱的 ${lowest.name}（${lowest.score}分）進行優化。`;
+                actionItems.push(`通知供應商其 ${lowest.name} 指標分數略低，要求其加強廠內相關製程之自主檢驗。`);
             } else {
                 weaknessesText = `各維度控制均勻，均在 A 級優良標準以上。`;
                 actionItems.push(`維持目前良好的品質監督機制，與供應商保持資訊對接。`);
